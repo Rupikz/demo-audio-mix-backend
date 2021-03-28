@@ -11,7 +11,14 @@ export class AudioMixController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('audio'))
+  @UseInterceptors(FileInterceptor('audio', {
+    fileFilter: (req: Request, file, cb) => {
+      if (!file.originalname.match(/\.(aac|mp3|wav|flac|wma)$/)) {
+        return cb(new Error('File type not allowed'), false);
+      }
+      return cb(null, true);
+    } 
+  }))
   mixAudio(
     @Body() audioMixEditDto: AudioMixEditDto,
     @UploadedFile() audio: Express.Multer.File
